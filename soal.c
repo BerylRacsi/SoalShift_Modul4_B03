@@ -8,6 +8,8 @@
 #include <errno.h>
 #include <sys/time.h>
 
+#include <stdlib.h>
+
 static int xmp_getattr(const char *path, struct stat *stbuf)
 {
 	int res;
@@ -45,23 +47,48 @@ static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 	return 0;
 }
 
+int ext_dilarang(const char *path)
+{
+	char dilarang[][8] = {"pdf","doc","txt"};
+	const char *ext = strrchr(path,'.')+1;
+
+	for (int i=0; i<3; i++)
+	{
+		if (strcmp(ext,dilarang[i])==0)
+		{
+			return 1;
+		}
+	
+	}
+	return 0;
+}
 static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 		    struct fuse_file_info *fi)
 {
-	int fd;
-	int res;
+	if(strstr(path,"Documents") && ext_dilarang(path))
+	{
+		system("notify-send 'Terjadi Kesalahan! File berisi konten berbahaya'");
+		
+		return -1;
+	}
 
-	(void) fi;
-	fd = open(path, O_RDONLY);
-	if (fd == -1)
+	else
+	{
+		int fd;
+		int res;
+
+		(void) fi;
+		fd = open(path, O_RDONLY);
+		if (fd == -1)
 		return -errno;
 
-	res = pread(fd, buf, size, offset);
-	if (res == -1)
+		res = pread(fd, buf, size, offset);
+		if (res == -1)
 		res = -errno;
 
-	close(fd);
-	return res;
+		close(fd);
+		return res;
+	}
 }
 
 static struct fuse_operations xmp_oper = {
