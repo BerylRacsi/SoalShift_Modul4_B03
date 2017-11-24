@@ -49,8 +49,8 @@ static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
 int ext_dilarang(const char *path)
 {
-	char dilarang[][8] = {"pdf","doc","txt"};
-	const char *ext = strrchr(path,'.')+1;
+	char dilarang[][8] = {".pdf",".doc",".txt"};
+	const char *ext = strrchr(path,'.');
 
 	for (int i=0; i<3; i++)
 	{
@@ -68,6 +68,10 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 	if(strstr(path,"Documents") && ext_dilarang(path))
 	{
 		system("notify-send 'Terjadi Kesalahan! File berisi konten berbahaya'");
+		
+		char tambahan[100];
+		sprintf(tambahan, "%s.ditandai", path);
+		rename(path, tambahan);
 		
 		return -1;
 	}
