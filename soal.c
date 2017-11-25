@@ -62,6 +62,15 @@ int ext_dilarang(const char *path)
 	}
 	return 0;
 }
+
+char *dirfolder(const char *path)
+{
+	char *dir = (char*) malloc(100*sizeof(char));
+	strcpy(dir,path);
+	*(strrchr(dir,'/')) = 0;
+	return dir;
+}
+
 static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 		    struct fuse_file_info *fi)
 {
@@ -72,6 +81,12 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 		char tambahan[100];
 		sprintf(tambahan, "%s.ditandai", path);
 		rename(path, tambahan);
+		
+		
+		char folder[100];
+		
+		
+		
 		
 		return -1;
 	}
