@@ -84,8 +84,16 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 		
 		
 		char folder[100];
+		sprintf(folder,"%s/rahasia",dirfolder(path));
+		DIR *rahasia = opendir(folder);
+		if(rahasia == NULL)
+		{
+			mkdir(folder,0700);
+		}
 		
-		
+		char pindahan[100];
+		sprintf(pindahan, "%s/%s", folder,(strrchr(tambahan,'/'))+1);
+		rename(tambahan,pindahan);
 		
 		
 		return -1;
